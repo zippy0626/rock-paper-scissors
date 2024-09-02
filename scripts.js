@@ -41,7 +41,7 @@ function playRound() {
 
     } else if ((humanChoice === 'paper' || humanChoice === 'p') && computerChoice === 'Rock') {
         humanScore += 1
-        console.log('You win, but you are still a loser.. Paper beats rock!');
+        console.log("You win, but you're still a loser.. Paper beats rock!");
         console.log(`Scores: You (barf) ${humanScore}  Computer ${computerScore}`);
         console.log('\n');
 
@@ -58,7 +58,7 @@ function playRound() {
 
         computerScore += 1
         console.log(`You suck! Haha, I knew you were a loser. ${computerChoice} beats ${humanChoice}!`);
-        console.log(`Scores: You (ICU) ${humanScore}  Computer ${computerScore}`);
+        console.log(`Scores: You (...) ${humanScore}  Computer ${computerScore}`);
         console.log('\n');
     };
 }
@@ -70,3 +70,22 @@ function resetScores() {
 }
 
 
+function playGame() {
+    for (let i = 0; i < 6; i++) {
+        playRound()
+    };
+
+    console.log(
+        `Game concluded! Total Scores:
+        
+        You (suck!) ${humanScore}
+        Computer ${computerScore}
+
+        GG!
+        `
+    );
+
+    resetScores()
+}
+
+playGame()
