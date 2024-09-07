@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: "Press Start 2P", system-ui;
+    font-weight: 400;
+}
+
+#console {
+    width: 500px;
+    height: 600px;
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    background-color: rgb(35, 35, 35    );
+    border-radius: 5px;
+    box-shadow: inset 2px 2px 20px 0 rgb(111, 125, 145),
+    inset -3px -3px 20px 0 rgb(111, 125, 145)
+}
+
+/* MAINSCREEN */
+#screen {
+    width: 375px;
+    height: 200px;
+    box-shadow: 0px 0px 3px;
+    background-color: #787806;
+    border: 5px solid rgb(27, 27, 27);
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+}
+
+.total-rounds-display, .game-output-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    /* Rounds Display */
+.total-rounds-display {
+    height: 3rem;
+    background-color: #6e6e17;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0px 0px 10px 0 rgba(0, 0, 0, .5)
+}
+
+.total-rounds-display p {
+    font-size: 10px;
+    margin: 0 1rem 0 1rem;
+}
+
+.total-rounds-display .rounds {
+    margin-left: auto;
+}
+
+    /* Game output */
+.game-output-display {
+    flex-direction: column;
+    justify-content: center;
+    font-size: 12px;
+    gap: 4px;
+    height: 100%;
+    background-color: #636313;
+    box-shadow: inset 3px 3px 10px 0 rgba(0,0,0,.8),
+                inset -4px -4px 10px 0 rgba(0,0,0,.8);
+} 
+
+/* LOWER AREA */
+.console-lower {
+    width: 400px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scoreboard Area */
+.score-board-area {
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    margin-left: .5rem;
+    margin-bottom: 2rem;
+    user-select: none;
+}
+
+    /* Scoreboard */
+.score-board {
+    height: 3rem;
+    width: 200px;
+    display: flex;
+    padding: .3rem;
+    gap: .6rem;
+    background-color: rgb(27, 27, 27);
+    box-shadow: 0px 0px 5px;
+}
+
+.human-score {
+    width: 50%;
+}
+
+.computer-score {
+    width: 50%;
+}
+
+.human-score, .computer-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    font-size: 10px;
+    background-color: #57570d;
+    border-radius: 4px;
+    box-shadow: inset 3px 3px 5px 0 rgba(0, 0, 0, 0.9), inset -3px -3px 5px 0 rgba(0,0,0, 0.9);
+}
+
+.four-dots {
+    width: 50px;
+    height: 50px;
+    margin-left: auto;
+    margin-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dot {
+    height: 16px;
+    width: 16px;
+    background-color: rgba(0, 0, 0, 0.397);
+    border-radius: 100%;
+}
+
+.across {
+    display: flex;
+    gap: 16px;
+}
+
+/* ALLBUTTONS */
+.buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 175px;
+}
+
+    /* Main buttons */
+.item-btns {
+    height: 150px;
+    width: 100%;
+    margin-bottom: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.button {
+    height: 100px;
+    width: 120px;
+    background-color: rgb(89, 78, 74);
+    border: 3px rgb(27,27,27) solid;
+    box-shadow: 0px 0px 6px;
+    border-radius: .5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    user-select: none;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 10px 0 rgba(0, 0, 0, 0.4), inset -2px -2px 10px 0 rgba(0,0,0, 0.4);
+}
+
+.reset-game {
+    height: 2.5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.message {
+    width: 200px;
+    background-color: #57570d;
+    border: 3px solid rgb(27, 27, 27);
+    border-radius: 4px;
+    box-shadow: 0px 0px 3px;
+    user-select: none;
+    box-shadow: inset 2px 2px 5px 0 rgba(0, 0, 0, 0.9),
+    inset -3px -3px 5px 0 rgba(0, 0, 0, .5)
+}
+
+.reset-game p {
+    font-size: 10px;
+    padding: 8px;
+}
+
+.reset {
+    margin-left: auto;
+    background-color: darkred;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px;
+    border: 3px solid rgb(27, 27, 27);
+    user-select: none;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 5px 0 rgba(0, 0, 0, 0.6),
+    inset -3px -3px 5px 0 rgba(0, 0, 0, .3)
+}
