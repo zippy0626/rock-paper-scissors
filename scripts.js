@@ -88,4 +88,5 @@ function playGame() {
     resetScores()
 }
 
-playGame()
+// playGame()
+
