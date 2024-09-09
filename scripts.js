@@ -1,42 +1,40 @@
 // Sleep Function
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
-// Rounds Resetter
-const rounds = document.querySelector('.rounds');
+// Rounds Resetter and round count
+let currentRoundNumber = 0;
 
-    function setRound(currentRoundNumber) {
+    function updateRound() {
+        const rounds = document.querySelector('.rounds');
         rounds.textContent = `Round ${currentRoundNumber}`
+    }
+
+    function resetRounds() {
+        const rounds = document.querySelector('.rounds');
+        rounds.textContent = `Round 0`
     }
 //
 
+// Initiate Player Choice
+let playerChoice = "";
 
-// Player Scores
-let humanScore = document.querySelector('.human-score');
-let computerScore = document.querySelector('.computer-score');
 
-    function addScore(scoreAmount, player) {
-        let hScoreNumber = Number(humanScore.textContent.slice(-1))
-        let cScoreNumber = Number(computerScore.textContent.slice(-1))
+// Initiate Score Counters
+let hScore = 0
+let cScore = 0
 
-        if (player === 'h') {
-            humanScore.textContent = `You:${hScoreNumber + scoreAmount}`
-        } else if (player === 'c') {
-            computerScore.textContent = `Bot:${cScoreNumber + scoreAmount}`
-        } 
-    }
-
-    function delScore(scoreAmount, player) {
-        let hScoreNumber = Number(humanScore.textContent.slice(-1))
-        let cScoreNumber = Number(computerScore.textContent.slice(-1))
-        
-        if (hScoreNumber > 0 && player === 'h') {
-            humanScore.textContent = `You:${hScoreNumber - scoreAmount}`
-        } else if (cScoreNumber > 0 && player === 'c') {
-            computerScore.textContent = `Bot:${cScoreNumber - scoreAmount}`
-        } 
+    // This changes DOM everytime you call it. 
+    // So every time update score, call this function
+    function updateScore() {
+        let humanScore = document.querySelector('.human-score');
+        let computerScore = document.querySelector('.computer-score');
+        computerScore.textContent = `Bot:${cScore}`
+        humanScore.textContent = `You:${hScore}`
     }
 
     function resetScores() {
+        let humanScore = document.querySelector('.human-score');
+        let computerScore = document.querySelector('.computer-score');
         humanScore.textContent = `You:0`
         computerScore.textContent = `Bot:0`
     }
@@ -58,37 +56,67 @@ const blinkSpeedMs = 800
 // Start Game
 const body = document.querySelector('body');
 
-    // Countdown with Async Function
-    async function startGame(event) {
-        resetScores();
-        setRound(1);
-        
-        if (event.code === 'Space' || event.key === ' ') {
-            outputDisplay.style.visibility = ""; // Make style unhidden
-    
-            let items = ['Rock!', 'Paper!', 'Scissors!', 'Shoot!'];
-    
-            for (let i = 0; i < items.length; i++) {
-                outputDisplay.textContent = `${items[i]}`;
-                await sleep(500);
-            }
-        }
-        await sleep(2000);
-
-        if (playerChoice === '') { //Player misses
-            outputDisplay.textContent = `Too Late!`;
-
-            addScore(1, "computer");
-            delScore(1, 'human');
-
-            await sleep(5000)
-        } else {
-            calculateWinner();
-        }
+// async function
+async function startGame(event) {
+    if (event.code !== 'Space' && event.key !== ' ') {
+        return;
     }
     
-    // eventListener only executes once
-    body.addEventListener('keydown', startGame, { once: true });
+    resetScores();
+    resetRounds();
+    
+    currentRoundNumber += 1
+    updateRound()
+    
+    outputDisplay.style.visibility = ""; // Make style unhidden (from blinking)
+
+    // Get Player Choice
+    const buttons = document.querySelectorAll('.button');
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            if (button.textContent === 'Rock' || button.textContent === 'Paper' || button.textContent === 'Scissors') {
+                playerChoice = button.textContent
+            }
+        });
+    });
+    //
+
+    let items = ['Rock!', 'Paper!', 'Scissors!', 'Shoot!'];
+
+    // Countdown
+    for (let i = 0; i < items.length; i++) {
+        // Check if Player is too early
+        if (items[i] !== 'Shoot!' && playerChoice !== "") {
+                outputDisplay.textContent = `Too Early!`;
+                cScore += 1
+                updateScore()
+                await sleep(2000)
+                showResultScreen()
+                return
+        };
+        outputDisplay.textContent = `${items[i]}`;
+        await sleep(500);
+    }
+    await sleep(1500); // 1.5 sec timeframe
+
+    // Player misses
+    if (playerChoice === '') { 
+        outputDisplay.textContent = `Too Late!`;
+
+        cScore += 1
+        updateScore()
+        await sleep(2500)
+        showResultScreen()
+    } else {
+        calculateWinner();
+    }
+}
+
+// eventListener only executes once
+body.addEventListener('keydown', startGame, { once: true }); 
+// This makes it so the AEL occurs once, not the function itself
+// So you can reuse the function
 
 
 // Randomly return rock, paper, scissors for Bot
@@ -108,22 +136,9 @@ function getComputerChoice() {
 
 // Main Logic
 
-// Player Choice
-let playerChoice = "";
-const buttons = document.querySelectorAll('.button');
-
-    buttons.forEach((button) => {
-        button.addEventListener('click', () => {
-            if (button.textContent === 'Rock' || button.textContent === 'Paper' || button.textContent === 'Scissors') {
-                playerChoice = button.textContent
-            }
-        });
-    });
-//
-
-
-const resultsDisplay = document.querySelector('.results-display'); // below output-display
+// outputDisplay
 const continueDisplay = document.querySelector('.continue');
+const confirmDisplay = document.querySelector('.confirm');
 
 function calculateWinner() {
 
@@ -133,77 +148,123 @@ function calculateWinner() {
     // Wins + Draw + Loose for Player
     if (computerChoice === playerChoice) {
         outputDisplay.textContent = `
-        Tie..For Now! ${playerChoice} clashes with ${computerChoice}!
+        Tie! ${playerChoice} clashes with ${computerChoice}!
         `
         showResultScreen()
     } else if (playerChoice === 'Rock' && computerChoice === 'Scissors') {
         outputDisplay.textContent = `
-        You win! But still suck!
+        You win!!
         `
+        hScore += 1
+        updateScore()
         showResultScreen()
-        addScore(1, 'h')
-        delScore(1, 'computer')
     } else if (playerChoice === 'Paper' && computerChoice === 'Rock') {
         outputDisplay.textContent = `
-        You..w-win..
+        You..win..
         `
+        hScore += 1
+        updateScore()
         showResultScreen()
-        addScore(1, 'h')
-        delScore(1, 'c')
     } else if (playerChoice === 'Scissors' && computerChoice === 'Paper') {
         outputDisplay.textContent = `
         Did you..win?
         `
+        hScore += 1
+        updateScore()
         showResultScreen()
-        addScore(1, 'h')
-        delScore(1, 'c')
     } else {
         outputDisplay.textContent = `
         YOU LOST!
         `
+        cScore += 1
+        updateScore()
         showResultScreen()
-        addScore(1, 'c')
-        delScore(1, 'h')
     };
 }
 
 // Show Results
 async function showResultScreen() {
-    resultsDisplay.textContent = `
-    ${humanScore.textContent}
-    ${computerScore.textContent}
-    `
-
-    await sleep(3000)
+    await sleep(2000)
     outputDisplay.style.display = 'none';
-
-    resultsDisplay.style.display = 'flex';
-
     continueDisplay.style.display = 'flex';
 }
 //
 
 
-// Continue or Not?
+// Continue Event Handlers
+const continueYes = document.querySelector('.continue-yes');
+const continueNo = document.querySelector('.continue-no');
 
-const yes = document.querySelector('.yes');
-yes.addEventListener('click', function);
+    // Click Yes
+async function continueGame() {
+    // Reset
+    playerChoice = ""
 
-const no = document.querySelector('.no');
+    currentRoundNumber+=1
+    updateRound()
+    
+    outputDisplay.style.display = 'flex';
+    continueDisplay.style.display = 'none';
+
+    // Get Player Choice
+    const buttons = document.querySelectorAll('.button');
+
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            if (button.textContent === 'Rock' || button.textContent === 'Paper' || button.textContent === 'Scissors') {
+                playerChoice = button.textContent
+            }
+        });
+    });
+    //
+    
+    let items = ['Rock!', 'Paper!', 'Scissors!', 'Shoot!'];
+    
+    // Countdown
+    for (let i = 0; i < items.length; i++) {
+        // Check if Player is too early
+        if (items[i] !== 'Shoot!' && playerChoice !== "") {
+            outputDisplay.textContent = `Too Early!`;
+            cScore += 1
+            updateScore()
+            await sleep(2000)
+            showResultScreen()
+            return
+        };
+        outputDisplay.textContent = `${items[i]}`;
+        await sleep(500);
+    }
+    await sleep(1500);
+    
+    if (playerChoice === '') { //Player misses
+        outputDisplay.textContent = `Too Late!`;
+
+        cScore += 1
+        updateScore()
+        await sleep(2500)
+        showResultScreen()
+    } else {
+        calculateWinner();
+    }
+}
+continueYes.addEventListener('click', continueGame);
+
+
+// Click No
+function showConfirmScreen() {
+    outputDisplay.style.display = 'none';
+    continueDisplay.style.display = 'none';
+    confirmDisplay.style.display = 'flex';
+}
+
+continueNo.addEventListener('click', showConfirmScreen);
+//
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+// Confirm Event Handlers
+const confirmYes = document.querySelector('.confirm-yes');
+const confirmNo = document.querySelector('.confirm-no');
 
 
 // Messages 
@@ -244,45 +305,3 @@ const messages = [
     function displayMessage(message) {
         
     }
-
-
-// function playRoun() {
-//     let humanChoice = getHumanChoice();
-//     let computerChoice = getComputerChoice();
-
-    
-//     if ((humanChoice === 'rock' || humanChoice === 'r') && computerChoice === 'Scissors') {
-//         humanScore += 1
-//         console.log('You win, boy. Rock beats scissors, duh.');
-//         console.log(`Scores: You (unimpressive) ${humanScore}  Computer ${computerScore}`);
-//         console.log('\n');
-
-//     } else if ((humanChoice === 'scissors' || humanChoice === 's') && computerChoice === 'Paper') {
-//         humanScore += 1
-//         console.log('You win... unimpressive. Scissors beat paper genius.');
-//         console.log(`Scores: You (ew) ${humanScore}  Computer ${computerScore}`);
-//         console.log('\n');
-
-//     } else if ((humanChoice === 'paper' || humanChoice === 'p') && computerChoice === 'Rock') {
-//         humanScore += 1
-//         console.log("You win, but you're still a loser.. Paper beats rock!");
-//         console.log(`Scores: You (barf) ${humanScore}  Computer ${computerScore}`);
-//         console.log('\n');
-
-//     } else if (humanChoice === computerChoice.toLowerCase() || humanChoice === computerChoice[0].toLowerCase()) {
-//         console.log(`Tie, for now.. ${humanChoice} clashes with ${computerChoice.toLowerCase()}!!!`);
-//         console.log(`Scores: You (me?) ${humanScore}  Computer ${computerScore}`);
-//         console.log('\n');
-    
-//     } else {
-
-//         if (humanScore > 0) {
-//             humanScore -= 1
-//         }
-
-//         computerScore += 1
-//         console.log(`You suck! Haha, I knew you were a loser. ${computerChoice} beats ${humanChoice}!`);
-//         console.log(`Scores: You (...) ${humanScore}  Computer ${computerScore}`);
-//         console.log('\n');
-//     };
-// }
