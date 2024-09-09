@@ -1,6 +1,9 @@
 // Sleep Function
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
+// Flag used to check if game is running
+let isGameRunning = true;
+
 // Rounds Resetter and round count
 let currentRoundNumber = 0;
 
@@ -11,7 +14,8 @@ let currentRoundNumber = 0;
 
     function resetRounds() {
         const rounds = document.querySelector('.rounds');
-        rounds.textContent = `Round 0`
+        rounds.textContent = `Round ?`
+        currentRoundNumber = 0
     }
 //
 
@@ -41,13 +45,19 @@ let cScore = 0
 //
 
 
-// Blink Effect
-const outputDisplay = document.querySelector('.output-display');
+// Displays that will be turned off with 'none'
+const mainDisplay = document.querySelector('.main-display');
+const continueMenu = document.querySelector('.continue-menu');
+const winnerMenu = document.querySelector('.winner-menu');
+const resetMenu = document.querySelector('.reset-menu');
+//
 
+
+// Blink Effect
 const blinkSpeedMs = 800
     const t = setInterval(function () {
-        if (outputDisplay.textContent.trim() === "Press SPACE to start..") { // If its something else, stop blink effect
-            outputDisplay.style.visibility = (outputDisplay.style.visibility === "hidden" ? "" : "hidden");
+        if (mainDisplay.textContent.trim() === "Press SPACE to start..") { // If its something else, stop blink effect
+            mainDisplay.style.visibility = (mainDisplay.style.visibility === "hidden" ? "" : "hidden");
         }
     }, blinkSpeedMs);
 //
@@ -58,6 +68,7 @@ const body = document.querySelector('body');
 
 // async function
 async function startGame(event) {
+
     if (event.code !== 'Space' && event.key !== ' ') {
         return;
     }
@@ -68,11 +79,9 @@ async function startGame(event) {
     currentRoundNumber += 1
     updateRound()
     
-    outputDisplay.style.visibility = ""; // Make style unhidden (from blinking)
+    mainDisplay.style.visibility = ""; // Make style unhidden (from blinking)
 
-    // Get Player Choice
     const buttons = document.querySelectorAll('.button');
-
     buttons.forEach((button) => {
         button.addEventListener('click', () => {
             if (button.textContent === 'Rock' || button.textContent === 'Paper' || button.textContent === 'Scissors') {
@@ -80,34 +89,36 @@ async function startGame(event) {
             }
         });
     });
-    //
 
     let items = ['Rock!', 'Paper!', 'Scissors!', 'Shoot!'];
-
-    // Countdown
     for (let i = 0; i < items.length; i++) {
-        // Check if Player is too early
+        if (!isGameRunning) {
+            return;
+        }
+
         if (items[i] !== 'Shoot!' && playerChoice !== "") {
-                outputDisplay.textContent = `Too Early!`;
+                mainDisplay.textContent = `Too Early!`;
                 cScore += 1
                 updateScore()
                 await sleep(2000)
-                showResultScreen()
+                showContinueMenu()
                 return
         };
-        outputDisplay.textContent = `${items[i]}`;
+        mainDisplay.textContent = `${items[i]}`;
         await sleep(500);
     }
-    await sleep(1500); // 1.5 sec timeframe
 
-    // Player misses
+    await sleep(1500);
+
     if (playerChoice === '') { 
-        outputDisplay.textContent = `Too Late!`;
+        mainDisplay.textContent = `Too Late!`;
 
         cScore += 1
         updateScore()
+
         await sleep(2500)
-        showResultScreen()
+        showContinueMenu()
+
     } else {
         calculateWinner();
     }
@@ -131,84 +142,115 @@ function getComputerChoice() {
         return "Scissors"
     }
 }
-//
 
 
-// Main Logic
+// Calculate winner after each round
+async function calculateWinner() {
 
-// outputDisplay
-const continueDisplay = document.querySelector('.continue');
-const confirmDisplay = document.querySelector('.confirm');
-
-function calculateWinner() {
-
-    // Use showResultScreen in this function as well as the Too Late screen
     let computerChoice = getComputerChoice()
 
     // Wins + Draw + Loose for Player
     if (computerChoice === playerChoice) {
-        outputDisplay.textContent = `
+        mainDisplay.textContent = `
         Tie! ${playerChoice} clashes with ${computerChoice}!
         `
-        showResultScreen()
+        await sleep(2000)
+        showContinueMenu()
     } else if (playerChoice === 'Rock' && computerChoice === 'Scissors') {
-        outputDisplay.textContent = `
+        mainDisplay.textContent = `
         You win!!
         `
         hScore += 1
         updateScore()
-        showResultScreen()
+        await sleep(1000)
+        showContinueMenu()
     } else if (playerChoice === 'Paper' && computerChoice === 'Rock') {
-        outputDisplay.textContent = `
+        mainDisplay.textContent = `
         You..win..
         `
         hScore += 1
         updateScore()
-        showResultScreen()
+        await sleep(1000)
+        showContinueMenu()
     } else if (playerChoice === 'Scissors' && computerChoice === 'Paper') {
-        outputDisplay.textContent = `
+        mainDisplay.textContent = `
         Did you..win?
         `
         hScore += 1
         updateScore()
-        showResultScreen()
+        await sleep(1000)
+        showContinueMenu()
     } else {
-        outputDisplay.textContent = `
+        mainDisplay.textContent = `
         YOU LOST!
         `
         cScore += 1
         updateScore()
-        showResultScreen()
+        await sleep(1000)
+        showContinueMenu()
     };
 }
 
-// Show Results
-async function showResultScreen() {
-    await sleep(2000)
-    outputDisplay.style.display = 'none';
-    continueDisplay.style.display = 'flex';
+async function showNoMenus() {
+    mainDisplay.style.display = 'none';
+    winnerMenu.style.display = 'none';
+    resetMenu.style.display = 'none';
+    continueMenu.style.display = 'none';
 }
-//
+
+async function showContinueMenu() {
+    await sleep(100) // Account for the Main Display showing to player
+    mainDisplay.style.display = 'none';
+    winnerMenu.style.display = 'none';
+    resetMenu.style.display = 'none';
+    continueMenu.style.display = 'flex';
+}
+
+async function showResetMenu() {
+    isGameRunning = false;
+    await sleep(100)
+    mainDisplay.style.display = 'none';
+    winnerMenu.style.display = 'none';
+    continueMenu.style.display = 'none';
+    resetMenu.style.display = 'flex';
+}
+
+async function showWinnerMenu() {
+    let playerOutcome = document.querySelector('.player-outcome');
+    await sleep(100)
+    mainDisplay.style.display = 'none';
+    continueMenu.style.display = 'none';
+    resetMenu.style.display = 'none';
+    winnerMenu.style.display = 'flex';
+
+    // Check if Player Bail early
+    if (cScore >= 5 || hScore <= cScore) {
+        playerOutcome.textContent = "You Lost!"
+    } else if (hScore >= 5) {
+        playerOutcome.textContent = "You Win!"
+    } 
+}
 
 
-// Continue Event Handlers
-const continueYes = document.querySelector('.continue-yes');
-const continueNo = document.querySelector('.continue-no');
 
-    // Click Yes
+// CONTINUE MENU EVENT HANDLERS FOR Y OR N
+const continueMenuYes = document.querySelector('.continue-menu-yes');
+const continueMenuNo = document.querySelector('.continue-menu-no');
+
 async function continueGame() {
-    // Reset
-    playerChoice = ""
+    isGameRunning = true;
 
-    currentRoundNumber+=1
+    playerChoice = ''
+
+    currentRoundNumber += 1
     updateRound()
     
-    outputDisplay.style.display = 'flex';
-    continueDisplay.style.display = 'none';
+    mainDisplay.style.display = 'flex';
+    winnerMenu.style.display = 'none';
+    continueMenu.style.display = 'none';
+    resetMenu.style.display = 'none'
 
-    // Get Player Choice
     const buttons = document.querySelectorAll('.button');
-
     buttons.forEach((button) => {
         button.addEventListener('click', () => {
             if (button.textContent === 'Rock' || button.textContent === 'Paper' || button.textContent === 'Scissors') {
@@ -216,55 +258,107 @@ async function continueGame() {
             }
         });
     });
-    //
-    
+
     let items = ['Rock!', 'Paper!', 'Scissors!', 'Shoot!'];
-    
-    // Countdown
     for (let i = 0; i < items.length; i++) {
-        // Check if Player is too early
+        if (!isGameRunning) {
+            return;
+        }
+        
         if (items[i] !== 'Shoot!' && playerChoice !== "") {
-            outputDisplay.textContent = `Too Early!`;
-            cScore += 1
-            updateScore()
-            await sleep(2000)
-            showResultScreen()
-            return
+                mainDisplay.textContent = `Too Early!`;
+                cScore += 1
+                updateScore()
+                await sleep(2000)
+                showContinueMenu()
+                return
         };
-        outputDisplay.textContent = `${items[i]}`;
+        
+        mainDisplay.textContent = `${items[i]}`;
         await sleep(500);
     }
+
     await sleep(1500);
-    
-    if (playerChoice === '') { //Player misses
-        outputDisplay.textContent = `Too Late!`;
+
+    if (playerChoice === '') { // Player Choice Empty
+        mainDisplay.textContent = `Too Late!`;
 
         cScore += 1
         updateScore()
+
+        // Winner Check
+        if (cScore >= 5) {
+            await sleep(2000)
+            showWinnerMenu()
+            return
+        } else if (hScore >= 5) {
+            await sleep(2000)
+            showWinnerMenu()
+            return
+        } 
+
         await sleep(2500)
-        showResultScreen()
+        showContinueMenu()
+        return
     } else {
+        
+        // Winner Check
+        if (cScore >= 5) {
+            await sleep(2000)
+            showWinnerMenu()
+            return
+        } else if (hScore >= 5) {
+            await sleep(2000)
+            showWinnerMenu()
+            return
+        }
+
         calculateWinner();
+        return
     }
 }
-continueYes.addEventListener('click', continueGame);
+
+continueMenuNo.addEventListener('click', showWinnerMenu);
+continueMenuYes.addEventListener('click', continueGame);
 
 
-// Click No
-function showConfirmScreen() {
-    outputDisplay.style.display = 'none';
-    continueDisplay.style.display = 'none';
-    confirmDisplay.style.display = 'flex';
+
+// RESET MENU EVENT HANDLERS FOR Y N
+const resetMenuYes = document.querySelector('.reset-menu-yes');
+const resetMenuNo = document.querySelector('.reset-menu-no');
+
+resetMenuNo.addEventListener('click', showContinueMenu);
+// resetMenuYes.addEventListener('click', () => {
+    
+// }); // Reset to Start Menu
+
+
+
+// WINNER MENU EVENT HANDLERS FOR Y N
+const winnerMenuYes = document.querySelector('.winner-menu-yes');
+const winnerMenuNo = document.querySelector('.winner-menu-no');
+
+winnerMenuYes.addEventListener('click', () => { // New Game
+    resetRounds()
+    resetScores()
+    continueGame()
+});
+// winnerMenuNo.addEventListener('click', ); // Reset to Start Menu
+
+
+
+// RESET BUTTON
+const resetButton = document.querySelector('.reset');
+resetButton.addEventListener('click', () => {
+    isGameRunning = false;
+    showResetMenu()
+});
+
+
+// RESET TO START MENU
+async function resetToStartMenu() {
+    
 }
-
-continueNo.addEventListener('click', showConfirmScreen);
-//
-
-
-
-// Confirm Event Handlers
-const confirmYes = document.querySelector('.confirm-yes');
-const confirmNo = document.querySelector('.confirm-no');
 
 
 // Messages 
