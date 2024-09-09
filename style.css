@@ -84,18 +84,7 @@ body {
                 inset -4px -4px 10px 0 rgba(0,0,0,.8);
 } 
 
-.output-display {
-    text-align: center;
-}
-
-.results-display {
-    text-align: center;
-    font-size: 10px;
-    margin-bottom: 5px;
-    display: none;
-}
-
-.continue {
+.continue-menu, .winner-menu, .reset-menu{
     display: none;
     justify-content: space-evenly;
     flex-direction: column;
@@ -104,6 +93,10 @@ body {
     font-size: 12px;
     width: 10rem;
     gap: 8px;
+}
+
+.main-display {
+    text-align: center;
 }
 
 .yes:hover {
