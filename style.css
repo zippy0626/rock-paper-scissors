@@ -226,8 +226,8 @@ body {
     margin-top: 2rem;
 }
 
-.message {
-    width: 220px;
+.message-box {
+    width: 230px;
     background-color: #57570d;
     border: 3px solid rgb(27, 27, 27);
     border-radius: 4px;
@@ -235,8 +235,15 @@ body {
     user-select: none;
     box-shadow: inset 2px 2px 5px 0 rgba(0, 0, 0, 0.9),
     inset -3px -3px 5px 0 rgba(0, 0, 0, .5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.message {
+    font-size: 10px;
+    text-wrap: nowrap;
     text-align: center;
-    font-size: 12px;
 }
 
 .reset-game p {
