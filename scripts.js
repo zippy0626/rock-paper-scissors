@@ -13,9 +13,9 @@ let currentRoundNumber = 0;
     }
 
     function resetRounds() {
+        currentRoundNumber = 0
         const rounds = document.querySelector('.rounds');
         rounds.textContent = `Round ?`
-        currentRoundNumber = 0
     }
 //
 
@@ -24,8 +24,24 @@ let playerChoice = "";
 
 
 // Initiate Score Counters
-let hScore = 0
-let cScore = 0
+let hScore = 0;
+let cScore = 0;
+
+async function checkWinner() {
+    if (cScore >= 5) {
+        isGameRunning = false;
+        await sleep(1500)
+        showWinnerMenu()
+        return
+    }
+    
+    if (hScore >= 5) {
+        isGameRunning = false;
+        await sleep(1500)
+        showWinnerMenu()
+        return
+    } 
+}
 
     // This changes DOM everytime you call it. 
     // So every time update score, call this function
@@ -37,6 +53,8 @@ let cScore = 0
     }
 
     function resetScores() {
+        hScore = 0;
+        cScore = 0;
         let humanScore = document.querySelector('.human-score');
         let computerScore = document.querySelector('.computer-score');
         humanScore.textContent = `You:0`
@@ -55,18 +73,16 @@ const resetMenu = document.querySelector('.reset-menu');
 
 // Blink Effect
 const blinkSpeedMs = 800
-    const t = setInterval(function () {
-        if (mainDisplay.textContent.trim() === "Press SPACE to start..") { // If its something else, stop blink effect
-            mainDisplay.style.visibility = (mainDisplay.style.visibility === "hidden" ? "" : "hidden");
-        }
-    }, blinkSpeedMs);
+const t = setInterval(() => {
+    if (mainDisplay.textContent.trim() === "Press SPACE to start..") { // If its something else, stop blink effect
+        mainDisplay.style.visibility = (mainDisplay.style.visibility === "hidden" ? "visible" : "hidden");
+    }
+}, blinkSpeedMs);
 //
 
 
 // Start Game
 const body = document.querySelector('body');
-
-// async function
 async function startGame(event) {
 
     if (event.code !== 'Space' && event.key !== ' ') {
@@ -147,6 +163,8 @@ function getComputerChoice() {
 // Calculate winner after each round
 async function calculateWinner() {
 
+    checkWinner()
+
     let computerChoice = getComputerChoice()
 
     // Wins + Draw + Loose for Player
@@ -160,25 +178,25 @@ async function calculateWinner() {
         mainDisplay.textContent = `
         You win!!
         `
-        hScore += 1
+        hScore = hScore + 1
         updateScore()
-        await sleep(1000)
+        await sleep(2000)
         showContinueMenu()
     } else if (playerChoice === 'Paper' && computerChoice === 'Rock') {
         mainDisplay.textContent = `
         You..win..
         `
-        hScore += 1
+        hScore = hScore + 1
         updateScore()
-        await sleep(1000)
+        await sleep(2000)
         showContinueMenu()
     } else if (playerChoice === 'Scissors' && computerChoice === 'Paper') {
         mainDisplay.textContent = `
         Did you..win?
         `
-        hScore += 1
+        hScore = hScore + 1
         updateScore()
-        await sleep(1000)
+        await sleep(2000)
         showContinueMenu()
     } else {
         mainDisplay.textContent = `
@@ -186,7 +204,7 @@ async function calculateWinner() {
         `
         cScore += 1
         updateScore()
-        await sleep(1000)
+        await sleep(2000)
         showContinueMenu()
     };
 }
@@ -242,6 +260,8 @@ async function continueGame() {
 
     playerChoice = ''
 
+    checkWinner()
+
     currentRoundNumber += 1
     updateRound()
     
@@ -265,13 +285,16 @@ async function continueGame() {
             return;
         }
         
-        if (items[i] !== 'Shoot!' && playerChoice !== "") {
-                mainDisplay.textContent = `Too Early!`;
-                cScore += 1
-                updateScore()
-                await sleep(2000)
-                showContinueMenu()
-                return
+        if (items[i] !== 'Shoot!' && playerChoice !== "") { // Player Too Early
+            mainDisplay.textContent = `Too Early!`;
+            cScore += 1
+            updateScore()
+            await sleep(2000)
+            
+            checkWinner()
+
+            showContinueMenu()
+            return
         };
         
         mainDisplay.textContent = `${items[i]}`;
@@ -286,33 +309,14 @@ async function continueGame() {
         cScore += 1
         updateScore()
 
-        // Winner Check
-        if (cScore >= 5) {
-            await sleep(2000)
-            showWinnerMenu()
-            return
-        } else if (hScore >= 5) {
-            await sleep(2000)
-            showWinnerMenu()
-            return
-        } 
+        checkWinner()
 
         await sleep(2500)
         showContinueMenu()
         return
-    } else {
+    } else { // Player clicked
+        checkWinner()
         
-        // Winner Check
-        if (cScore >= 5) {
-            await sleep(2000)
-            showWinnerMenu()
-            return
-        } else if (hScore >= 5) {
-            await sleep(2000)
-            showWinnerMenu()
-            return
-        }
-
         calculateWinner();
         return
     }
@@ -361,27 +365,31 @@ async function resetToStartMenu() {
 }
 
 
-// Messages 
+
+// MESSAGES 
 const messages = [
     "Dang..You Suck!",
     "Just quit bro!",
     "GG NO RE!",
     "Stop..the HORROR!",
+    "Stop..the BEAUTY!",
     "I C U",
     "<3",
     "U SUK!",
     "UwU",
-    "That was fun,right..",
+    "That was fun, right?",
     "...",
     "Choose rock!",
     "Choose paper!",
     "Choose scissors!",
     "U win??",
     "U LOZE!",
+    "Prepare to Win!",
+    "Prepare to Lose!",
     "nooooob",
     "Dang..You good!",
     "#&#@^$@@#",
-    "!OMGG!",
+    "OMGG!",
     "why u keep lose?",
     "why u keep win?",
     "Surrender!",
@@ -389,13 +397,37 @@ const messages = [
     "Take a hike..",
     "I've seen enough",
     "My heart..POUNDS!",
+    "My stomach..GROWLS!",
+    "Scary!",
+    "BoOOOoOoOO",
     "NOOOO!",
     "YESSS!",
     "noooooo",
     "yessss",
     "You're funny..",
+    "BUM!",
+    "P U !",
+    "Stinky..",
+    "I bet you like cheese",
+    "jajajaja",
+    "HAHA!",
+    "Cheat Code: RPPSRSP",
 ]
 
-    function displayMessage(message) {
-        
-    }
+// From MDN Docs
+function getRandomArbitrary(min, max) {
+    return Math.ceil(Math.random() * (max - min) + min); //Round Number
+}
+
+const message = document.querySelector('.message');
+async function displayMessage() {
+    const message = document.querySelector('.message');
+    let currentMsgIndex = getRandomArbitrary(0, messages.length - 1);
+
+    message.textContent = messages[currentMsgIndex]
+}
+
+// Change Message Every Interval
+const changeMsg = setInterval(() => {
+    displayMessage();
+}, 15000);
