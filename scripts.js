@@ -164,6 +164,9 @@ function getComputerChoice() {
 async function calculateWinner() {
 
     checkWinner()
+    if (!isGameRunning) {
+        return;
+    }
 
     let computerChoice = getComputerChoice()
 
@@ -261,6 +264,9 @@ async function continueGame() {
     playerChoice = ''
 
     checkWinner()
+    if (!isGameRunning) {
+        return;
+    }
 
     currentRoundNumber += 1
     updateRound()
@@ -292,6 +298,9 @@ async function continueGame() {
             await sleep(2000)
             
             checkWinner()
+            if (!isGameRunning) {
+                return;
+            }
 
             showContinueMenu()
             return
@@ -310,12 +319,18 @@ async function continueGame() {
         updateScore()
 
         checkWinner()
+        if (!isGameRunning) {
+            return;
+        }
 
         await sleep(2500)
         showContinueMenu()
         return
     } else { // Player clicked
         checkWinner()
+        if (!isGameRunning) {
+            return;
+        }
         
         calculateWinner();
         return
