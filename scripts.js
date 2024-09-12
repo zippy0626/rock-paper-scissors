@@ -180,6 +180,7 @@ async function calculateWinner() {
     } else if (playerChoice === 'Rock' && computerChoice === 'Scissors') {
         mainDisplay.textContent = `
         You win!!
+        ${playerChoice} beats ${computerChoice}!
         `
         hScore = hScore + 1
         updateScore()
@@ -188,6 +189,7 @@ async function calculateWinner() {
     } else if (playerChoice === 'Paper' && computerChoice === 'Rock') {
         mainDisplay.textContent = `
         You..win..
+        ${playerChoice} beats ${computerChoice}?
         `
         hScore = hScore + 1
         updateScore()
@@ -196,6 +198,7 @@ async function calculateWinner() {
     } else if (playerChoice === 'Scissors' && computerChoice === 'Paper') {
         mainDisplay.textContent = `
         Did you..win?
+        ${playerChoice} beats ${computerChoice}!!
         `
         hScore = hScore + 1
         updateScore()
@@ -204,6 +207,7 @@ async function calculateWinner() {
     } else {
         mainDisplay.textContent = `
         YOU LOST!
+        ${computerChoice} beats ${playerChoice}! L
         `
         cScore += 1
         updateScore()
